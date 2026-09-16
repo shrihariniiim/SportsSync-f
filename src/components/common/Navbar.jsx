@@ -1,8 +1,7 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { useSelector } from 'react-redux';
-import { Bell, Menu, X, ChevronDown, LogOut, User, Settings, LayoutDashboard } from 'lucide-react';
-import { useAuth } from '../../hooks/useAuth';
+import { Bell, Menu, X, ChevronDown, LogOut, User, LayoutDashboard } from 'lucide-react';
+import { getRedirectPathByRole, useAuth } from '../../hooks/useAuth';
 import { useNotifications } from '../../hooks/useSocket';
 import { getInitials, getAvatarBg } from '../../utils/formatters';
 
@@ -12,11 +11,6 @@ const NAV_LINKS = {
   trainer:    [{ to: '/trainer/dashboard', label: 'Dashboard' }, { to: '/trainer/sessions', label: 'Sessions' }],
   organizer:  [{ to: '/organizer/dashboard', label: 'Dashboard' }, { to: '/organizer/events', label: 'Events' }],
   admin:      [{ to: '/admin/dashboard', label: 'Dashboard' }, { to: '/admin/users', label: 'Users' }, { to: '/admin/venues', label: 'Venues' }],
-};
-
-const DASHBOARD_ROUTES = {
-  player: '/home', turf_owner: '/owner/dashboard', trainer: '/trainer/dashboard',
-  organizer: '/organizer/dashboard', admin: '/admin/dashboard',
 };
 
 export default function Navbar() {
@@ -89,7 +83,7 @@ export default function Navbar() {
                       <p className="text-xs text-gray-500 truncate">{user?.email}</p>
                       <span className="badge badge-green mt-1 capitalize">{user?.role?.replace('_', ' ')}</span>
                     </div>
-                    <Link to={DASHBOARD_ROUTES[user?.role] || '/home'} onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                    <Link to={getRedirectPathByRole(user?.role)} onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                       <LayoutDashboard size={15} /> Dashboard
                     </Link>
                     <Link to="/profile" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">

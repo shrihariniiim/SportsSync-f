@@ -49,15 +49,18 @@ export const useAuth = () => {
   };
 };
 
+const ROLE_REDIRECTS = {
+  player:     '/home',
+  turf_owner: '/owner/dashboard',
+  trainer:    '/trainer/dashboard',
+  organizer:  '/organizer/dashboard',
+  admin:      '/admin/dashboard',
+};
+
+export const getRedirectPathByRole = (role) => ROLE_REDIRECTS[role] || '/home';
+
 export const redirectByRole = (role, navigate) => {
-  const routes = {
-    player:     '/home',
-    turf_owner: '/owner/dashboard',
-    trainer:    '/trainer/dashboard',
-    organizer:  '/organizer/dashboard',
-    admin:      '/admin/dashboard',
-  };
-  navigate(routes[role] || '/home');
+  navigate(getRedirectPathByRole(role));
 };
 
 export default useAuth;

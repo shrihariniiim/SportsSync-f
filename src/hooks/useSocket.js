@@ -108,7 +108,7 @@ export const useNotifications = () => {
     await notificationService.markRead(id).catch(() => {});
   }, [dispatch]);
 
-  const handleMarkAllRead = useCallback(async () => {
+  const handleMarkAllRead = useCllback(async () => {
     dispatch(markAllRead());
     await notificationService.markAllRead().catch(() => {});
   }, [dispatch]);

@@ -2,9 +2,9 @@ import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { MapPin, Star, Clock, ChevronLeft, ChevronRight, Shield, Loader2, Calendar } from 'lucide-react';
 import { venueService, slotService } from '../../services/index';
-import { StarRating, EmptyState, LoadingSpinner } from '../../components/common/index.jsx';
+import { StarRating, LoadingSpinner } from '../../components/common/index.jsx';
 import { SPORT_TYPES } from '../../utils/constants';
-import { formatDate, formatCurrency } from '../../utils/formatters';
+import { localDateInputValue } from '../../utils/formatters';
 import toast from 'react-hot-toast';
 
 export default function VenueDetail() {
@@ -12,7 +12,7 @@ export default function VenueDetail() {
   const navigate = useNavigate();
   const [venue,        setVenue]        = useState(null);
   const [slots,        setSlots]        = useState([]);
-  const [selectedDate, setSelectedDate] = useState(todayISO());
+  const [selectedDate, setSelectedDate] = useState(localDateInputValue());
   const [selectedSport,setSelectedSport]= useState('');
   const [imgIdx,       setImgIdx]       = useState(0);
   const [loading,      setLoading]      = useState(true);
@@ -219,7 +219,7 @@ export default function VenueDetail() {
               <input
                 type="date"
                 className="input"
-                min={todayISO()}
+                min={localDateInputValue()}
                 value={selectedDate}
                 onChange={(e) => setSelectedDate(e.target.value)}
               />
@@ -273,8 +273,4 @@ export default function VenueDetail() {
       </div>
     </div>
   );
-}
-
-function todayISO() {
-  return new Date().toISOString().split('T')[0];
 }

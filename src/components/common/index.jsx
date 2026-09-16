@@ -23,8 +23,9 @@ export function PageLoader() {
 
 // ─── ProtectedRoute ───────────────────────────────────────────────────────────
 export function ProtectedRoute({ allowedRoles, children }) {
-  const { isAuthenticated, user } = useSelector((s) => s.auth);
+  const { isAuthenticated, loading, user } = useSelector((s) => s.auth);
 
+  if (loading) return <PageLoader />;
   if (!isAuthenticated) return <Navigate to="/login" replace />;
   if (allowedRoles && !allowedRoles.includes(user?.role)) return <Navigate to="/unauthorized" replace />;
 

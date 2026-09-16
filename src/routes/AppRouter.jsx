@@ -1,11 +1,14 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 import { ProtectedRoute, UnauthorizedPage } from '../components/common/index.jsx';
 import Navbar from '../components/common/Navbar.jsx';
+import { getRedirectPathByRole } from '../hooks/useAuth';
 
 // Auth pages
 import Login       from '../pages/auth/Login.jsx';
 import Register    from '../pages/auth/Register.jsx';
 import OAuthCallback from '../pages/auth/OAuthCallback.jsx';
+import Landing      from '../pages/Landing/Landing.jsx';
 
 // Player pages
 import Home         from '../pages/player/Home.jsx';
@@ -49,11 +52,25 @@ const Layout = ({ children }) => (
   </div>
 );
 
+const RootRoute = () => {
+  const { isAuthenticated, accessToken, loading, user } = useSelector((s) => s.auth);
+
+  if (loading) {
+    return <Layout><div className="flex justify-center py-20">Loading...</div></Layout>;
+  }
+
+  if (isAuthenticated && accessToken) {
+    return <Navigate to={getRedirectPathByRole(user?.role)} replace />;
+  }
+
+  return <Landing />;
+};
+
 export default function AppRouter() {
   return (
     <Routes>
       {/* Public routes */}
-      <Route path="/"           element={<Navigate to="/home" replace />} />
+      <Route path="/"           element={<RootRoute />} />
       <Route path="/login"      element={<Login />} />
       <Route path="/register"   element={<Register />} />
       <Route path="/oauth/callback" element={<OAuthCallback />} />
