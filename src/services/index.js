@@ -48,19 +48,21 @@ export const bookingService = {
 
 // ─── Game ─────────────────────────────────────────────────────────────────────
 export const gameService = {
-  getAll:    (params) => api.get('/games', { params }),
-  getNearby: (params) => api.get('/games/nearby', { params }),
-  getById:   (id)     => api.get(`/games/${id}`),
-  create:    (data)   => api.post('/games', data),
-  join:      (id)     => api.post(`/games/${id}/join`),
-  leave:     (id)     => api.post(`/games/${id}/leave`),
-  cancel:    (id, reason) => api.put(`/games/${id}/cancel`, { reason }),
+  getAll:        (params) => api.get('/games', { params }),
+  getNearby:     (params) => api.get('/games/nearby', { params }),
+  getById:       (id)     => api.get(`/games/${id}`),
+  create:        (data)   => api.post('/games', data),
+  join:          (id)     => api.post(`/games/${id}/join`),
+  leave:         (id)     => api.post(`/games/${id}/leave`),
+  leaveWaitlist: (id)     => api.post(`/games/${id}/leave-waitlist`),
+  cancel:        (id, reason) => api.put(`/games/${id}/cancel`, { reason }),
 };
 
 // ─── Trainer ──────────────────────────────────────────────────────────────────
 export const trainerService = {
   getAll:        (params) => api.get('/trainers', { params }),
   getNearby:     (params) => api.get('/trainers/nearby', { params }),
+  getMyProfile:  ()       => api.get('/trainers/profile/me'),
   getById:       (id)     => api.get(`/trainers/${id}`),
   createProfile: (data)   => api.post('/trainers/profile', data),
   updateProfile: (data)   => api.put('/trainers/profile', data),

@@ -15,6 +15,7 @@ export default function GameDetail() {
   const [game,    setGame]    = useState(null);
   const [loading, setLoading] = useState(true);
   const [joining, setJoining] = useState(false);
+  const [leavingWaitlist, setLeavingWaitlist] = useState(false);
 
   useEffect(() => { fetchGame(); }, [id]);
 
@@ -53,14 +54,44 @@ export default function GameDetail() {
     }
   };
 
+  const handleLeaveWaitlist = async () => {
+    setLeavingWaitlist(true);
+    try {
+      await gameService.leaveWaitlist(id);
+      toast.success('Removed from waitlist');
+      fetchGame();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Could not leave waitlist');
+    } finally {
+      setLeavingWaitlist(false);
+    }
+  };
+
+  const [cancelling, setCancelling] = useState(false);
+
+  const handleCancelGame = async () => {
+    const reason = window.prompt('Please enter a reason for cancelling this game (optional):');
+    if (reason === null) return;
+    setCancelling(true);
+    try {
+      await gameService.cancel(id, reason || 'Cancelled by organizer');
+      toast.success('Game cancelled successfully');
+      fetchGame();
+    } catch (err) {
+      toast.error(err.response?.data?.message || 'Could not cancel game');
+    } finally {
+      setCancelling(false);
+    }
+  };
+
   if (loading) return <div className="flex justify-center py-20"><LoadingSpinner size="lg" /></div>;
   if (!game)   return null;
 
   const sportInfo  = SPORT_TYPES.find((s) => s.value === game.sport);
   const statusInfo = GAME_STATUS_MAP[game.status] || GAME_STATUS_MAP.open;
-  const isCreator  = game.creator?._id === user?._id;
-  const isParticipant = game.participants?.some((p) => p.user?._id === user?._id);
-  const isWaitlisted  = game.waitlist?.some((w) => (w._id || w) === user?._id);
+  const isCreator  = (game.creator?._id || game.creator)?.toString() === user?._id?.toString();
+  const isParticipant = game.participants?.some((p) => (p.user?._id || p.user)?.toString() === user?._id?.toString());
+  const isWaitlisted  = game.waitlist?.some((w) => (w._id || w)?.toString() === user?._id?.toString());
   const fillPercent   = Math.round((game.currentPlayers / game.requiredPlayers) * 100);
 
   return (
@@ -161,12 +192,35 @@ export default function GameDetail() {
         </div>
 
         {/* Actions */}
+        {isCreator && game.status !== 'cancelled' && game.status !== 'completed' && (
+          <div>
+            <button
+              onClick={handleCancelGame}
+              disabled={cancelling}
+              className="btn-danger w-full"
+            >
+              {cancelling ? <><Loader2 size={16} className="animate-spin inline mr-1" /> Cancelling Game...</> : 'Cancel Game'}
+            </button>
+          </div>
+        )}
+
         {!isCreator && game.status !== 'cancelled' && game.status !== 'completed' && (
           <div>
             {isParticipant ? (
               <button onClick={handleLeave} className="btn-danger w-full">Leave Game</button>
             ) : isWaitlisted ? (
-              <button disabled className="btn-secondary w-full opacity-60">On Waitlist</button>
+              <div className="space-y-2">
+                <div className="text-center text-sm font-medium text-amber-600 bg-amber-50 py-2.5 px-4 rounded-xl border border-amber-200">
+                  ⏳ You are on the waitlist for this game
+                </div>
+                <button
+                  onClick={handleLeaveWaitlist}
+                  disabled={leavingWaitlist}
+                  className="btn-secondary w-full text-red-600 hover:bg-red-50"
+                >
+                  {leavingWaitlist ? 'Leaving Waitlist...' : 'Leave Waitlist'}
+                </button>
+              </div>
             ) : (
               <button onClick={handleJoin} disabled={joining} className="btn-primary w-full btn-lg">
                 {joining ? <><Loader2 size={16} className="animate-spin" /> Joining...</> : game.currentPlayers >= game.requiredPlayers ? 'Join Waitlist' : `🎮 Join Game${game.costPerPlayer > 0 ? ` — ₹${game.costPerPlayer}` : ''}`}

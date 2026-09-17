@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, NavLink, useNavigate } from 'react-router-dom';
-import { Bell, Menu, X, ChevronDown, LogOut, User, LayoutDashboard } from 'lucide-react';
+import { Bell, Menu, X, ChevronDown, LogOut, User, LayoutDashboard, Calendar } from 'lucide-react';
 import { getRedirectPathByRole, useAuth } from '../../hooks/useAuth';
 import { useNotifications } from '../../hooks/useSocket';
 import { getInitials, getAvatarBg } from '../../utils/formatters';
@@ -8,7 +8,7 @@ import { getInitials, getAvatarBg } from '../../utils/formatters';
 const NAV_LINKS = {
   player:     [{ to: '/home',        label: 'Explore'   }, { to: '/games',  label: 'Games'    }, { to: '/trainers', label: 'Trainers' }, { to: '/events', label: 'Events' }],
   turf_owner: [{ to: '/owner/dashboard', label: 'Dashboard' }, { to: '/owner/venues', label: 'Venues' }, { to: '/owner/bookings', label: 'Bookings' }, { to: '/owner/revenue', label: 'Revenue' }],
-  trainer:    [{ to: '/trainer/dashboard', label: 'Dashboard' }, { to: '/trainer/sessions', label: 'Sessions' }],
+  trainer:    [{ to: '/trainer/dashboard', label: 'Dashboard' }, { to: '/trainer/profile', label: 'My Profile' }],
   organizer:  [{ to: '/organizer/dashboard', label: 'Dashboard' }, { to: '/organizer/events', label: 'Events' }],
   admin:      [{ to: '/admin/dashboard', label: 'Dashboard' }, { to: '/admin/users', label: 'Users' }, { to: '/admin/venues', label: 'Venues' }],
 };
@@ -86,6 +86,11 @@ export default function Navbar() {
                     <Link to={getRedirectPathByRole(user?.role)} onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                       <LayoutDashboard size={15} /> Dashboard
                     </Link>
+                    {(user?.role === 'player' || user?.role === 'admin') && (
+                      <Link to="/bookings/my" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
+                        <Calendar size={15} /> My Bookings
+                      </Link>
+                    )}
                     <Link to="/profile" onClick={() => setProfileOpen(false)} className="flex items-center gap-2.5 px-4 py-2 text-sm text-gray-700 hover:bg-gray-50">
                       <User size={15} /> Profile
                     </Link>

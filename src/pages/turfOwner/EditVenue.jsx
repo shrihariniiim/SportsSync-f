@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import { useForm } from 'react-hook-form';
 import { Loader2, MapPin, Trash2, X } from 'lucide-react';
@@ -75,10 +75,18 @@ export default function EditVenue() {
     }
   };
 
-  // Sync geolocation hook's coordinates to local state when requested
+  const locationRequestedRef = useRef(false);
+
+  const handleUseLocation = () => {
+    locationRequestedRef.current = true;
+    requestLocation();
+  };
+
+  // Sync geolocation hook's coordinates only when explicitly requested by user
   useEffect(() => {
-    if (geoCoordinates) {
+    if (geoCoordinates && locationRequestedRef.current) {
       setLocalCoordinates(geoCoordinates);
+      locationRequestedRef.current = false;
     }
   }, [geoCoordinates]);
 
@@ -142,8 +150,8 @@ export default function EditVenue() {
         pricing,
         openingHours,
         venueType: data.venueType,
-        lat: localCoordinates?.lat || parseFloat(data.lat),
-        lng: localCoordinates?.lng || parseFloat(data.lng),
+        lat: !isNaN(parseFloat(data.lat)) ? parseFloat(data.lat) : localCoordinates?.lat,
+        lng: !isNaN(parseFloat(data.lng)) ? parseFloat(data.lng) : localCoordinates?.lng,
         images: existingImages, // Remaining existing image URLs
       };
 
@@ -234,7 +242,7 @@ export default function EditVenue() {
           <div className="p-3 bg-blue-50 rounded-xl border border-blue-100">
             <div className="flex items-center justify-between mb-2">
               <p className="text-sm font-medium text-blue-700">Location Coordinates</p>
-              <button type="button" onClick={requestLocation} className="text-xs text-blue-600 hover:underline flex items-center gap-1">
+              <button type="button" onClick={handleUseLocation} className="text-xs text-blue-600 hover:underline flex items-center gap-1">
                 <MapPin size={12} /> Use my location
               </button>
             </div>

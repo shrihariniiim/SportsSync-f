@@ -1,20 +1,37 @@
 import { format, formatDistanceToNow, isToday, isTomorrow } from 'date-fns';
 
 // ─── Date helpers ─────────────────────────────────────────────────────────────
-export const formatDate = (date, pattern = 'dd MMM yyyy') =>
-  date ? format(new Date(date), pattern) : '—';
+export const parseSafeDate = (date) => {
+  if (!date) return null;
+  if (date instanceof Date) return date;
+  if (typeof date === 'string' && /^\d{4}-\d{2}-\d{2}$/.test(date)) {
+    const [y, m, d] = date.split('-').map(Number);
+    return new Date(y, m - 1, d);
+  }
+  return new Date(date);
+};
 
-export const formatDateTime = (date) =>
-  date ? format(new Date(date), 'dd MMM yyyy, h:mm a') : '—';
+export const formatDate = (date, pattern = 'dd MMM yyyy') => {
+  const d = parseSafeDate(date);
+  return d && !Number.isNaN(d.getTime()) ? format(d, pattern) : '—';
+};
 
-export const timeAgo = (date) =>
-  date ? formatDistanceToNow(new Date(date), { addSuffix: true }) : '';
+export const formatDateTime = (date) => {
+  const d = parseSafeDate(date);
+  return d && !Number.isNaN(d.getTime()) ? format(d, 'dd MMM yyyy, h:mm a') : '—';
+};
+
+export const timeAgo = (date) => {
+  const d = parseSafeDate(date);
+  return d && !Number.isNaN(d.getTime()) ? formatDistanceToNow(d, { addSuffix: true }) : '';
+};
 
 export const friendlyDate = (date) => {
-  if (!date) return '—';
-  const d = new Date(date);
-  if (isToday(d))    return `Today, ${format(d, 'h:mm a')}`;
-  if (isTomorrow(d)) return `Tomorrow, ${format(d, 'h:mm a')}`;
+  const d = parseSafeDate(date);
+  if (!d || Number.isNaN(d.getTime())) return '—';
+  const hasTime = d.getHours() !== 0 || d.getMinutes() !== 0;
+  if (isToday(d))    return hasTime ? `Today, ${format(d, 'h:mm a')}` : 'Today';
+  if (isTomorrow(d)) return hasTime ? `Tomorrow, ${format(d, 'h:mm a')}` : 'Tomorrow';
   return format(d, 'EEE, dd MMM');
 };
 
@@ -42,10 +59,12 @@ export const truncate = (str, len = 80) =>
   str && str.length > len ? `${str.slice(0, len)}...` : str;
 
 export const getInitials = (name = '') =>
-  name.split(' ').slice(0, 2).map((n) => n[0]).join('').toUpperCase();
+  (name || '').trim().split(' ').filter(Boolean).slice(0, 2).map((n) => n[0]).join('').toUpperCase() || '?';
 
 export const getAvatarBg = (name = '') => {
   const colors = ['bg-violet-500','bg-blue-500','bg-green-500','bg-amber-500','bg-rose-500','bg-teal-500','bg-indigo-500'];
-  const idx = name.charCodeAt(0) % colors.length;
-  return colors[idx];
+  if (!name || typeof name !== 'string' || name.length === 0) return colors[0];
+  const charCode = name.charCodeAt(0) || 0;
+  const idx = Math.abs(charCode) % colors.length;
+  return colors[idx] || colors[0];
 };

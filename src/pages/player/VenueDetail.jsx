@@ -40,7 +40,8 @@ export default function VenueDetail() {
   };
 
   const handleReserve = async (slot) => {
-    if (slot.status !== 'available') return;
+    const isBookable = slot.isBookable !== undefined ? slot.isBookable : (slot.status === 'available' && !slot.isPast);
+    if (!isBookable) return;
     try {
       await slotService.reserve(slot._id);
       toast.success('Slot reserved! Proceeding to checkout...');
@@ -245,21 +246,28 @@ export default function VenueDetail() {
                 <div className="flex justify-center py-6"><LoadingSpinner /></div>
               ) : slots.length > 0 ? (
                 <div className="grid grid-cols-2 gap-2 max-h-72 overflow-y-auto pr-1">
-                  {slots.map((slot) => (
-                    <button
-                      key={slot._id}
-                      onClick={() => handleReserve(slot)}
-                      disabled={slot.status !== 'available' || !venue.isCurrentlyAvailable}
-                      className={`p-2.5 rounded-lg border text-sm font-medium transition-all ${
-                        slot.status === 'available' && venue.isCurrentlyAvailable
-                          ? 'border-primary-200 bg-primary-50 text-primary-700 hover:bg-primary-100 active:scale-95'
-                          : 'border-gray-100 bg-gray-50 text-gray-300 cursor-not-allowed'
-                      }`}
-                    >
-                      <div className="font-semibold">{slot.startTime}</div>
-                      <div className="text-xs">{slot.status === 'available' ? `₹${slot.price}` : slot.status}</div>
-                    </button>
-                  ))}
+                  {slots.map((slot) => {
+                    const isBookable = slot.isBookable !== undefined
+                      ? slot.isBookable
+                      : (slot.status === 'available' && !slot.isPast);
+                    return (
+                      <button
+                        key={slot._id}
+                        onClick={() => handleReserve(slot)}
+                        disabled={!isBookable}
+                        className={`p-2.5 rounded-lg border text-sm font-medium transition-all ${
+                          isBookable
+                            ? 'border-primary-200 bg-primary-50 text-primary-700 hover:bg-primary-100 active:scale-95'
+                            : 'border-gray-100 bg-gray-50 text-gray-400 cursor-not-allowed'
+                        }`}
+                      >
+                        <div className="font-semibold">{slot.startTime}</div>
+                        <div className="text-xs">
+                          {slot.isPast ? 'Passed' : slot.status === 'available' ? `₹${slot.price}` : slot.status}
+                        </div>
+                      </button>
+                    );
+                  })}
                 </div>
               ) : (
                 <div className="text-center py-6 text-sm text-gray-400">
@@ -274,3 +282,4 @@ export default function VenueDetail() {
     </div>
   );
 }
+

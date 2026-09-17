@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
-import { setCredentials } from '../../store/slices/authSlice';
+import { setAccessToken, setCredentials } from '../../store/slices/authSlice';
 import { authService } from '../../services/index';
 import { LoadingSpinner } from '../../components/common/index.jsx';
 import { redirectByRole } from '../../hooks/useAuth';
@@ -22,17 +22,24 @@ export default function OAuthCallback() {
       return;
     }
 
-    // Store tokens first so axios interceptor works
+    // 1. Store tokens in localStorage
     localStorage.setItem('ss_token',   accessToken);
-    localStorage.setItem('ss_refresh', refreshToken || '');
+    if (refreshToken) {
+      localStorage.setItem('ss_refresh', refreshToken);
+    }
 
+    // 2. Dispatch token to Redux immediately so api.js request interceptor has it
+    dispatch(setAccessToken(accessToken));
+
+    // 3. Now fetch profile with authenticated request
     authService.getMe()
       .then(({ data }) => {
         dispatch(setCredentials({ user: data.data.user, accessToken, refreshToken }));
         toast.success(`Welcome, ${data.data.user.name}!`);
         redirectByRole(data.data.user.role, navigate);
       })
-      .catch(() => {
+      .catch((err) => {
+        console.error('OAuth profile fetch error:', err);
         toast.error('Failed to load profile');
         navigate('/login');
       });

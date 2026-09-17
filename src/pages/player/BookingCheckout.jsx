@@ -63,8 +63,8 @@ export default function BookingCheckout() {
           });
           toast.success('🎉 Booking confirmed!');
           navigate('/bookings/my');
-        } catch {
-          toast.error('Payment verification failed. Contact support.');
+        } catch (err) {
+          toast.error(err.response?.data?.message || 'Payment verification failed. Contact support.');
         }
       },
       modal: {

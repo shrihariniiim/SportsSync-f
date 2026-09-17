@@ -16,10 +16,13 @@ import VenueSearch  from '../pages/player/VenueSearch.jsx';
 import VenueDetail  from '../pages/player/VenueDetail.jsx';
 import BookingCheckout from '../pages/player/BookingCheckout.jsx';
 import MyBookings   from '../pages/player/MyBookings.jsx';
+import BookingDetail from '../pages/player/BookingDetail.jsx';
 import Games        from '../pages/player/Games.jsx';
 import CreateGame   from '../pages/player/CreateGame.jsx';
 import GameDetail   from '../pages/player/GameDetail.jsx';
 import Trainers     from '../pages/player/Trainers.jsx';
+import TrainerDetail from '../pages/player/TrainerDetail.jsx';
+import Events       from '../pages/player/Events.jsx';
 import PlayerProfile from '../pages/player/PlayerProfile.jsx';
 import NotificationsPage from '../pages/player/NotificationsPage.jsx';
 
@@ -82,10 +85,13 @@ export default function AppRouter() {
       <Route path="/venues/:id" element={<ProtectedRoute><Layout><VenueDetail /></Layout></ProtectedRoute>} />
       <Route path="/bookings/checkout" element={<ProtectedRoute allowedRoles={['player','admin']}><Layout><BookingCheckout /></Layout></ProtectedRoute>} />
       <Route path="/bookings/my" element={<ProtectedRoute><Layout><MyBookings /></Layout></ProtectedRoute>} />
+      <Route path="/bookings/:id" element={<ProtectedRoute><Layout><BookingDetail /></Layout></ProtectedRoute>} />
       <Route path="/games" element={<ProtectedRoute><Layout><Games /></Layout></ProtectedRoute>} />
       <Route path="/games/create" element={<ProtectedRoute allowedRoles={['player','admin']}><Layout><CreateGame /></Layout></ProtectedRoute>} />
       <Route path="/games/:id" element={<ProtectedRoute><Layout><GameDetail /></Layout></ProtectedRoute>} />
       <Route path="/trainers" element={<ProtectedRoute><Layout><Trainers /></Layout></ProtectedRoute>} />
+      <Route path="/trainers/:id" element={<ProtectedRoute><Layout><TrainerDetail /></Layout></ProtectedRoute>} />
+      <Route path="/events" element={<ProtectedRoute><Layout><Events /></Layout></ProtectedRoute>} />
       <Route path="/profile" element={<ProtectedRoute><Layout><PlayerProfile /></Layout></ProtectedRoute>} />
       <Route path="/notifications" element={<ProtectedRoute><Layout><NotificationsPage /></Layout></ProtectedRoute>} />
 

@@ -42,6 +42,13 @@ export const BOOKING_STATUS_MAP = {
   no_show:   { label: 'No Show',   color: 'badge-gray'   },
 };
 
+export const PAYMENT_STATUS_MAP = {
+  pending:  { label: 'Pending',  color: 'badge-yellow' },
+  paid:     { label: 'Paid',     color: 'badge-green'  },
+  failed:   { label: 'Failed',   color: 'badge-red'    },
+  refunded: { label: 'Refunded', color: 'badge-gray'   },
+};
+
 export const GAME_STATUS_MAP = {
   open:      { label: 'Open',      color: 'badge-green'  },
   full:      { label: 'Full',      color: 'badge-blue'   },

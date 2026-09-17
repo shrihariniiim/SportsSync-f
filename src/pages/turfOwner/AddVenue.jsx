@@ -35,8 +35,8 @@ export default function AddVenue() {
         address: { street: data.street, city: data.city, state: data.state, pincode: data.pincode },
         sports, amenities, pricing, openingHours,
         venueType: data.venueType,
-        lat: coordinates?.lat || parseFloat(data.lat),
-        lng: coordinates?.lng || parseFloat(data.lng),
+        lat: !isNaN(parseFloat(data.lat)) ? parseFloat(data.lat) : coordinates?.lat,
+        lng: !isNaN(parseFloat(data.lng)) ? parseFloat(data.lng) : coordinates?.lng,
       };
 
       const { data: response } = await venueService.create(payload);

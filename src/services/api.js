@@ -12,7 +12,7 @@ const api = axios.create({
 // Request interceptor — attach access token and default content type
 api.interceptors.request.use(
   (config) => {
-    const token = store.getState().auth.accessToken;
+    const token = store.getState().auth.accessToken || localStorage.getItem('ss_token');
     if (token) config.headers.Authorization = `Bearer ${token}`;
 
     // Don't set Content-Type for FormData (let axios handle it)
